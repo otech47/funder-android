@@ -1,11 +1,17 @@
 package com.setmusic.funder;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
 
 public class FunderMainActivity extends FragmentActivity  {
 
@@ -15,6 +21,9 @@ public class FunderMainActivity extends FragmentActivity  {
     private final float HUE_SET_GREEN = 150.5F;
 
     private View mainRootView;
+    private ImageButton investorSwipingButton;
+    private ImageButton founderSwipingButton;
+    private ImageButton recordPitchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,28 +42,43 @@ public class FunderMainActivity extends FragmentActivity  {
 
         mainRootView = getWindow().getDecorView();
 
-
-        mainRootView.findViewById(R.id.investor_swiping).setOnClickListener(new View.OnClickListener() {
+        investorSwipingButton = (ImageButton)mainRootView.findViewById(R.id.investor_swiping);
+        investorSwipingButton.setImageDrawable(new IconicsDrawable(this)
+                .icon(FontAwesome.Icon.faw_usd)
+                .color(Color.WHITE));
+        investorSwipingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createAndAddFragment("InvestorSwipingFragment", InvestorSwipingFragment.class,
                         true, null);
             }
         });
-        mainRootView.findViewById(R.id.founder_swiping).setOnClickListener(new View.OnClickListener() {
+
+        founderSwipingButton = (ImageButton)mainRootView.findViewById(R.id.founder_swiping);
+        founderSwipingButton.setImageDrawable(new IconicsDrawable(this)
+                .icon(FontAwesome.Icon.faw_user)
+                .color(Color.WHITE));
+        founderSwipingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createAndAddFragment("FounderSwipingFragment", FounderSwipingFragment.class,
                         true, null);
             }
         });
-        mainRootView.findViewById(R.id.record_pitch).setOnClickListener(new View.OnClickListener() {
+
+        recordPitchButton = (ImageButton)mainRootView.findViewById(R.id.record_pitch);
+        recordPitchButton.setImageDrawable(new IconicsDrawable(this)
+                .icon(FontAwesome.Icon.faw_video_camera)
+                .color(Color.WHITE));
+        recordPitchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createAndAddFragment("RecordPitchFragment", RecordPitchFragment.class,
                         true, null);
             }
         });
+
+        investorSwipingButton.callOnClick();
 
     }
 
@@ -70,12 +94,11 @@ public class FunderMainActivity extends FragmentActivity  {
                 frag.setArguments(bundleData);
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//                ft.setCustomAnimations(R.anim.enter_from_right,R.anim.exit_to_left,R.anim.enter_from_left,R.anim.exit_to_right);
-                ft.replace(R.id.main_container, frag, tag);
+                ft.setCustomAnimations(R.anim.enter_from_right,R.anim.exit_to_left,R.anim.enter_from_left,R.anim.exit_to_right);
+                ft.replace(R.id.fragment_container, frag, tag);
                 if(addToBackStack)
                     ft.addToBackStack(tag);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-
                 ft.commit();
             } catch (InstantiationException e) {
                 e.printStackTrace();
@@ -85,10 +108,11 @@ public class FunderMainActivity extends FragmentActivity  {
         } else {
             Log.d(TAG, "frag is not null: " + tag);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//            ft.setCustomAnimations(R.anim.exit_to_left,R.anim.enter_from_right);//,R.anim.enter_from_left,R.anim.exit_to_right);
-            ft.replace(R.id.main_container, frag, tag);
+            ft.setCustomAnimations(R.anim.enter_from_right,R.anim.exit_to_left,R.anim.enter_from_left,R.anim.exit_to_right);
+            ft.replace(R.id.fragment_container, frag, tag);
             if(addToBackStack)
                 ft.addToBackStack(tag);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commit();
         }
     }
