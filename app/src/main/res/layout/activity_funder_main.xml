@@ -22,14 +22,81 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_funder_main"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/main_container">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/navbar">
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:id="@+id/investor_swiping"
+                android:layout_height="50dp"/>
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:id="@+id/founder_swiping"
+                android:layout_height="50dp"/>
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:id="@+id/record_pitch"
+                android:layout_height="50dp"/>
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:id="@+id/match_notification"
+                android:layout_height="50dp"/>
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:id="@+id/accept_call_notification"
+                android:layout_height="50dp"/>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:id="@+id/fragment_container"
+            android:layout_above="@id/navbar"
+            android:layout_height="match_parent">
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:id="@+id/loader"
+        android:visibility="gone"
+        android:background="@color/transparent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:indeterminate="true"
+            android:layout_centerInParent="true"
+            />
+
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>
