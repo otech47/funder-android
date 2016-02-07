@@ -61,7 +61,7 @@
                     android:layout_alignParentBottom="true"
                     android:paddingBottom="5dp"
                     android:layout_below="@id/companyName"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/topmostColor"
                     android:textSize="11sp" />
 
                 <ImageView

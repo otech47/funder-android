@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/investor_swipe_view"
-        android:background="@color/gray_transparent"
+        android:background="@color/topmostColor"
         android:padding="10dp"
         app:rotation_degrees="10"
         app:max_visible="1"
@@ -29,7 +29,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
+            android:background="@color/white_transparent"
             android:orientation="vertical">
 
             <LinearLayout
@@ -44,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:text="Connected!"
                     android:paddingTop="30dp"
-                    android:textColor="@color/dark_gray"
+                    android:textColor="@color/backgroundDark"
                     android:textAlignment="center"
                     android:textSize="38sp"
 
@@ -96,7 +96,7 @@
                     android:layout_height="wrap_content"
                     android:text="Time for a quick intro call?"
                     android:textAlignment="center"
-                    android:textColor="@color/dark_gray"
+                    android:textColor="@color/backgroundDark"
                     android:paddingBottom="20dp"
                     android:textSize="24sp" />
 

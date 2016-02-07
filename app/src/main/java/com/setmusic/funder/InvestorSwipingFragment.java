@@ -1,6 +1,8 @@
 package com.setmusic.funder;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -104,6 +106,15 @@ public class InvestorSwipingFragment extends Fragment {
         founderMatchIcon = (ImageView)rootView.findViewById(R.id.founderMatchIcon);
         callNow = (Button)rootView.findViewById(R.id.call_now);
         later = (Button)rootView.findViewById(R.id.later);
+
+        callNow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent sky = new Intent("android.intent.action.VIEW");
+                sky.setData(Uri.parse("skype:emart21?call&video=true"));
+                startActivity(sky);
+            }
+        });
 
         kickOffFoundersApiRequest();
 

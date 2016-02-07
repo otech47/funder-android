@@ -35,7 +35,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/gray"
+            android:background="@color/topColor"
             android:orientation="horizontal"
             android:layout_alignParentBottom="true"
             android:id="@+id/navbar">
@@ -62,24 +62,6 @@
                 android:padding="10dp"
                 android:background="@color/green"
                 android:id="@+id/record_pitch"
-                android:layout_height="50dp"/>
-
-            <ImageButton
-                android:layout_width="50dp"
-                android:layout_weight="1"
-                android:padding="10dp"
-                android:visibility="gone"
-                android:background="@color/transparent"
-                android:id="@+id/match_notification"
-                android:layout_height="50dp"/>
-
-            <ImageButton
-                android:layout_width="50dp"
-                android:layout_weight="1"
-                android:visibility="gone"
-                android:padding="10dp"
-                android:background="@color/transparent"
-                android:id="@+id/accept_call_notification"
                 android:layout_height="50dp"/>
 
         </LinearLayout>

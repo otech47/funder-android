@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/founder_swipe_view"
-        android:background="@color/gray_transparent"
+        android:background="@color/topmostColor"
         android:padding="10dp"
         app:rotation_degrees="10"
         app:max_visible="4"
