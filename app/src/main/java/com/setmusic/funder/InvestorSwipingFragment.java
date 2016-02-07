@@ -163,7 +163,7 @@ public class InvestorSwipingFragment extends Fragment {
             try {
                 JSONObject json = new JSONObject(strings);
                 videoUrl = strings;
-                ((VideoView) rootView.findViewById(R.id.companyPitchVideo)).setVideoPath(videoUrl);
+                //((VideoView) rootView.findViewById(R.id.companyPitchVideo)).setVideoPath(videoUrl);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
