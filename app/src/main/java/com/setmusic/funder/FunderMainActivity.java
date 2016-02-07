@@ -16,6 +16,8 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 import com.mikepenz.iconics.context.IconicsLayoutInflater;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 public class FunderMainActivity extends FragmentActivity  {
 
@@ -41,13 +43,12 @@ public class FunderMainActivity extends FragmentActivity  {
 
         setContentView(R.layout.activity_funder_main);
 
-//        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
-//                .diskCacheExtraOptions(480, 800, null)
-//                .diskCacheSize(50 * 1024 * 1024)
-//                .diskCacheFileCount(100)
-//                .build();
-//
-//        ImageLoader.getInstance().init(config);
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+                .diskCacheExtraOptions(480, 800, null)
+                .diskCacheSize(50 * 1024 * 1024)
+                .diskCacheFileCount(100)
+                .build();
+        ImageLoader.getInstance().init(config);
 
         mainRootView = getWindow().getDecorView();
 
@@ -87,7 +88,7 @@ public class FunderMainActivity extends FragmentActivity  {
             }
         });
 
-        investorSwipingButton.callOnClick();
+        recordPitchButton.callOnClick();
 
     }
 

@@ -2,6 +2,7 @@ package com.setmusic.funder;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -16,6 +17,7 @@ import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,14 +34,13 @@ public class InvestorSwipingFragment extends Fragment {
     private FunderMainActivity mainActivity;
     private Context context;
     private View rootView;
-    private VideoView videoView;
-
-    String videoUrl;
 
     private List<Founder> founders;
     private FounderCardAdapter founderCardAdapter;
 
-    final android.os.Handler handler = new android.os.Handler();
+    private int match;
+
+    final Handler handler = new Handler();
     final Runnable apiFailure = new Runnable() {
         @Override
         public void run() {
@@ -47,10 +48,17 @@ public class InvestorSwipingFragment extends Fragment {
 
         }
     };
-    final Runnable updateVideoUI = new Runnable() {
+    final Runnable updateSwiperUI = new Runnable() {
         @Override
         public void run() {
-            updateVideo();
+            configureSwipePager();
+
+        }
+    };
+    final Runnable checkMatchUI = new Runnable() {
+        @Override
+        public void run() {
+            checkMatch();
 
         }
     };
@@ -71,14 +79,57 @@ public class InvestorSwipingFragment extends Fragment {
 
         rootView = inflater.inflate(R.layout.fragment_investor_swiping,container,false);
 
+        kickOffFoundersApiRequest();
+
+
+
+        return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume");
+
+    }
+
+    public void kickOffFoundersApiRequest() {
+        Log.d(TAG, "kickOffInvestorsApiRequest");
+
+        new ApiGetRequest(context).run("http://funder-app.azurewebsites.net/api/founders", new Callback
+                () {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Log.d(TAG, "ApiGetRequest: onFailure");
+
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                Log.d(TAG, "ApiGetRequest: onResponse");
+                Log.d(TAG, Integer.toString(response.code()));
+                Log.d(TAG, response.headers().toString());
+                try {
+                    JSONArray foundersJson = new JSONArray(response.body().string());
+                    Log.d(TAG, foundersJson.toString());
+                    founders = new ArrayList<>();
+                    for (int i = 0; i < 2; i++) {
+                        founders.add(new Founder(foundersJson.getJSONObject(i)));
+                    }
+                    handler.post(updateSwiperUI);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void configureSwipePager() {
+        Log.d(TAG, "configureSwipePager");
+        Log.d(TAG, "" + founders.size());
+
         SwipeFlingAdapterView flingContainer = (SwipeFlingAdapterView) rootView.findViewById(R.id
                 .investor_swipe_view);
-
-        founders = new ArrayList<>();
-
-        founders.add(new Founder("Evan Martinez"));
-        founders.add(new Founder("Oscar Lafarga"));
-
         //choose your favorite adapter
         founderCardAdapter = new FounderCardAdapter(context, founders);
 
@@ -94,30 +145,32 @@ public class InvestorSwipingFragment extends Fragment {
             public void removeFirstObjectInAdapter() {
                 // this is the simplest way to delete an object from the Adapter (/AdapterView)
                 Log.d("LIST", "removed object!");
+
+            }
+
+            @Override
+            public void onLeftCardExit(Object dataObject) {
+                Toast.makeText(context, "Left!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onLeftCardExit: " + dataObject.toString());
+                Log.d(TAG, "onLeftCardExit: founders" + founders.size());
                 founders.remove(0);
                 founderCardAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onLeftCardExit(Object dataObject) {
-                //Do something on the left!
-                //You also have access to the original object.
-                //If you want to use it just cast it (String) dataObject
-                Toast.makeText(context, "Left!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
             public void onRightCardExit(Object dataObject) {
                 Toast.makeText(context, "Right!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onRightCardExit: " + dataObject.toString());
+                Log.d(TAG, "onRightCardExit: founders" + founders.get(0));
+                swipeRight("Andreessen Horowitz", founders.get(0).getCompany());
+                founders.remove(0);
+                founderCardAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
                 // Ask for more data here
-                founderCardAdapter.add(new Founder("Founder"));
-                founderCardAdapter.notifyDataSetChanged();
-                Log.d("LIST", "notified");
-                itemsInAdapter++;
+                Log.d(TAG, "onAdapterAboutToEmpty");
             }
         });
 
@@ -128,44 +181,47 @@ public class InvestorSwipingFragment extends Fragment {
                 Toast.makeText(context, "Click!", Toast.LENGTH_SHORT).show();
             }
         });
-
-        return rootView;
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume");
-//        new ApiGetRequest(context).run("https://player.vimeo.com/video/154461399/config", new Callback() {
-//            @Override
-//            public void onFailure(Request request, IOException e) {
-//                Log.d(TAG, "ApiGetRequest: onFailure");
-//            }
-//
-//            @Override
-//            public void onResponse(Response response) throws IOException {
-//                Log.d(TAG, "ApiGetRequest: onResponse");
-//                Log.d(TAG, Integer.toString(response.code()));
-//                Log.d(TAG, response.headers().toString());
-//                try {
-//                    JSONObject json = new JSONObject(response.body().string());
-//                    Log.d(TAG, json.toString());
-//                    videoUrl = json.getJSONObject("request").getJSONObject("files")
-//                            .getJSONArray("progressive").getJSONObject(0).getString("url");
-//                    handler.post(updateVideoUI);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//        });
+        founderCardAdapter.notifyDataSetChanged();
 
     }
 
-    public void updateVideo() {
-        videoView.setVideoPath(videoUrl);
-        videoView.start();
+    public void swipeRight(String investor, String user) {
+        String postDataJson = "{\"user\": \"" + investor + "\", " +
+                "\"type\":true,\"target\":\"" + user + "\"}";
+        new ApiPostRequest(context).run("http://funder-app.azurewebsites.net/api/swipe/new",
+                postDataJson, new Callback() {
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+                        Log.d(TAG, "ApiPostRequest: onFailure");
+                        handler.post(apiFailure);
+                    }
+
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        Log.d(TAG, "ApiPostRequest: onResponse");
+                        Log.d(TAG, "" + response.code());
+                        Log.d(TAG, response.headers().toString());
+
+                        try {
+                            JSONObject json = new JSONObject(response.body().string());
+                            match = json.getInt("match");
+                            handler.post(checkMatchUI);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
     }
+
+    public void checkMatch() {
+        Log.d(TAG, "checkMatch: " + match);
+        if(match > 0) {
+            
+        }
+    }
+
 
 }

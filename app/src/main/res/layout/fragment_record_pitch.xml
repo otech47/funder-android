@@ -11,6 +11,7 @@
     <RelativeLayout
                 android:layout_width="match_parent"
                 android:id="@+id/instructions_container"
+                android:visibility="visible"
                 android:background="@color/gray_transparent"
                 android:layout_height="match_parent">
         <TextView
@@ -64,16 +65,15 @@
         android:layout_width="match_parent"
         android:id="@+id/upload_progress_container"
         android:visibility="gone"
+        android:background="@color/gray_transparent"
         android:layout_height="match_parent">
 
         <ProgressBar
-            android:layout_width="match_parent"
-            android:paddingStart="20dp"
-            android:id="@+id/upload_progress"
-            android:layout_alignParentBottom="true"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:paddingEnd="20dp"
-            android:layout_height="50dp"/>
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:indeterminate="true"
+            android:layout_centerInParent="true"
+            />
 
     </RelativeLayout>
 

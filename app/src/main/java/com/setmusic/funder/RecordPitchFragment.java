@@ -18,6 +18,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.squareup.okhttp.Callback;
@@ -33,6 +42,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by oscarlafarga on 2/6/16.
@@ -58,6 +69,8 @@ public class RecordPitchFragment extends Fragment {
 
     private String locationUrl;
 
+    public File videoFile;
+
 
     final Handler handler = new Handler();
 
@@ -74,6 +87,19 @@ public class RecordPitchFragment extends Fragment {
         public void run() {
             putRequest();
 
+        }
+    };
+
+    final Runnable done = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(getActivity().getApplicationContext(), "Video uploaded successfully",
+                    Toast.LENGTH_SHORT).show();
+            rootView.findViewById(R.id.upload_progress_container).setVisibility(View.GONE);
+            rootView.findViewById(R.id.instructions_container).setVisibility(View.VISIBLE);
+            File fileToDelete = new File(Environment.getExternalStorageDirectory() + File
+                    .separator + "videoToUpload.mp4");
+            fileToDelete.delete();
         }
     };
 
@@ -124,9 +150,9 @@ public class RecordPitchFragment extends Fragment {
 
         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         if (takeVideoIntent.resolveActivity(context.getPackageManager()) != null) {
-//            File fileHD = new File(Environment.getExternalStorageDirectory() + File
-//                    .separator + "videoToUpload.jpg");
-//            takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fileHD));
+            File fileHD = new File(Environment.getExternalStorageDirectory() + File
+                    .separator + "videoToUpload.mp4");
+            takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fileHD));
             startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
         }
     }
@@ -137,44 +163,49 @@ public class RecordPitchFragment extends Fragment {
         Log.d(TAG, Integer.toString(resultCode));
 
         if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
-            videoUrl = intent.getData();
-            Log.d(TAG, videoUrl.toString());
-            Cursor returnCursor = context.getContentResolver().query(videoUrl, null, null, null,
-                    null);
-            int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+            File fileHD = new File(Environment.getExternalStorageDirectory() + File
+                    .separator + "videoToUpload.mp4");
+            videoFile = fileHD;
 
-            InputStream in = null;
-            try {
-                in = context.getContentResolver().openInputStream(videoUrl);
-
-                binaryBytes = IOUtils.toByteArray(in);
-                binaryData = new String(binaryBytes);
-                Log.d(TAG, "binaryBytes: " + binaryBytes.length);
-            } catch (FileNotFoundException e) {
-                Log.e("cpsample", "file not found " + videoUrl, e);
-            } catch (IOException e) {
-                Log.e("io", "error found " + videoUrl, e);
-            }
-            finally {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException e) {
-                        Log.e("cpsample", "could not close stream", e);
-                    }
-                }
-            }
-
-            returnCursor.moveToFirst();
-            videoSize = returnCursor.getLong(sizeIndex);
-            Log.d(TAG, "" + videoSize);
-            returnCursor.close();
+//            videoUrl = intent.getData();
+//            Log.d(TAG, videoUrl.toString());
+//            Cursor returnCursor = context.getContentResolver().query(videoUrl, null, null, null,
+//                    null);
+//            int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+//
+//            InputStream in = null;
+//            try {
+//                in = context.getContentResolver().openInputStream(videoUrl);
+//
+//                binaryBytes = IOUtils.toByteArray(in);
+//                binaryData = new String(binaryBytes);
+//                Log.d(TAG, "binaryBytes: " + binaryBytes.length);
+//            } catch (FileNotFoundException e) {
+//                Log.e("cpsample", "file not found " + videoUrl, e);
+//            } catch (IOException e) {
+//                Log.e("io", "error found " + videoUrl, e);
+//            }
+//            finally {
+//                if (in != null) {
+//                    try {
+//                        in.close();
+//                    } catch (IOException e) {
+//                        Log.e("cpsample", "could not close stream", e);
+//                    }
+//                }
+//            }
+//
+//            returnCursor.moveToFirst();
+//            videoSize = returnCursor.getLong(sizeIndex);
+//            Log.d(TAG, "" + videoSize);
+//            returnCursor.close();
 
             Toast.makeText(context, "Starting upload..." + videoUrl, Toast.LENGTH_SHORT).show();
             rootView.findViewById(R.id.instructions_container).setVisibility(View.GONE);
             rootView.findViewById(R.id.upload_progress_container).setVisibility(View.VISIBLE);
 
 //            uploadVideo();
+            uploadImageToS3(videoFile.getName());
 
         }
     }
@@ -308,6 +339,91 @@ public class RecordPitchFragment extends Fragment {
         });
     }
 
+    public void uploadImageToS3(String filename) {
+        Log.d(TAG, "uploadImageToS3");
+        rootView.findViewById(R.id.upload_progress_container).setVisibility(View.VISIBLE);
+        rootView.findViewById(R.id.instructions_container).setVisibility(View.GONE);
 
+        String extension = filename.substring(filename.indexOf("."));
+        String sha1 = ValidateUtils.SHA1(filename + System.currentTimeMillis());
+        final String encodedFilename = sha1 + extension;
+        final String key = "brown/" + encodedFilename;
+
+        Log.d(TAG, key);
+
+        // Initialize the Amazon Cognito credentials provider
+        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                context,
+                Constants.AMAZON_COGNITO_AUTH_KEY, // Identity Pool ID
+                Regions.US_EAST_1 // Region
+        );
+
+        AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
+        TransferUtility transferUtility = new TransferUtility(s3, getActivity()
+                .getApplicationContext());
+
+        ObjectMetadata myObjectMetadata = new ObjectMetadata();
+        Map<String, String> userMetadata = new HashMap<String, String>();
+        userMetadata.put("Content-Type", "video/mp4");
+        Log.d(TAG, "" + videoFile.length());
+        myObjectMetadata.setUserMetadata(userMetadata);
+
+        TransferObserver observer = transferUtility.upload(
+                Constants.AMAZON_S3_BUCKET,     // The bucket to upload to */
+                key,                            // The key for the uploaded object */
+                videoFile,               // The file where the data to upload exists */
+                myObjectMetadata
+        );
+        observer.setTransferListener(new TransferListener() {
+            @Override
+            public void onStateChanged(int id, TransferState state) {
+                Log.d(TAG, state.toString());
+                if (state.toString().equals("COMPLETED")) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Done uploading.", Toast
+                            .LENGTH_SHORT).show();
+                    Log.d(TAG, Constants.S3_URL + key);
+
+                    postToEvan(Constants.S3_URL + key);
+                }
+            }
+
+            @Override
+            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+            }
+
+            @Override
+            public void onError(int id, Exception ex) {
+                Toast.makeText(getActivity().getApplicationContext(), "An error occurred. Please try " +
+                        "again later.", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, ex.toString());
+                ex.printStackTrace();
+            }
+        });
+
+    }
+
+    public void postToEvan(String videoUrl) {
+        String postDataJson = "{\"video_url\": \"" + videoUrl + "\", " +
+                "\"user\":\"Elefunder\"}";
+
+        new ApiPostRequest(mainActivity).run("http://funder-app.azurewebsites.net/api/upload",
+                postDataJson, new Callback() {
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+                        Log.d(TAG, "ApiPostRequest: onFailure");
+                        handler.post(apiFailure);
+                    }
+
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        Log.d(TAG, "ApiPostRequest: onResponse");
+                        Log.d(TAG, "" + response.code());
+                        Log.d(TAG, response.headers().toString());
+
+                        handler.post(done);
+
+                    }
+                });
+    }
 
 }

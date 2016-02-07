@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
-                android:background="@color/blue"
                 android:layout_width="match_parent"
               android:layout_height="match_parent">
 
@@ -12,9 +11,9 @@
         android:layout_height="match_parent"
         android:id="@+id/investor_swipe_view"
         android:background="@color/gray_transparent"
-        android:padding="20dp"
-        app:rotation_degrees="16"
-        app:max_visible="4"
+        android:padding="10dp"
+        app:rotation_degrees="10"
+        app:max_visible="1"
         app:min_adapter_stack="6" />
 
 

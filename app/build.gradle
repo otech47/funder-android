@@ -36,4 +36,8 @@ dependencies {
     compile 'com.lorentzos.swipecards:library:1.0.9@aar' // Swiping library
     compile 'commons-io:commons-io:2.4'
 
+    // Amazon SDKs
+    compile 'com.amazonaws:aws-android-sdk-core:2.+'
+    compile 'com.amazonaws:aws-android-sdk-cognito:2.+'
+    compile 'com.amazonaws:aws-android-sdk-s3:2.+'
 }
