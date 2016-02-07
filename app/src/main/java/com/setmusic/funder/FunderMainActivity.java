@@ -88,7 +88,7 @@ public class FunderMainActivity extends FragmentActivity  {
             }
         });
 
-        recordPitchButton.callOnClick();
+        investorSwipingButton.callOnClick();
 
     }
 

@@ -9,6 +9,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -34,6 +45,14 @@ public class InvestorSwipingFragment extends Fragment {
     private FunderMainActivity mainActivity;
     private Context context;
     private View rootView;
+    private RelativeLayout matchOverlay;
+    private LinearLayout buttonContainer;
+    private ImageView investorMatchIcon;
+    private ImageView founderMatchIcon;
+    private Button callNow;
+    private Button later;
+
+    private SwipeFlingAdapterView swipeView;
 
     private List<Founder> founders;
     private FounderCardAdapter founderCardAdapter;
@@ -77,11 +96,16 @@ public class InvestorSwipingFragment extends Fragment {
         mainActivity = (FunderMainActivity)getActivity();
         context = mainActivity.getApplicationContext();
 
-        rootView = inflater.inflate(R.layout.fragment_investor_swiping,container,false);
+        rootView = inflater.inflate(R.layout.fragment_investor_swiping, container, false);
+        matchOverlay = (RelativeLayout)rootView.findViewById(R.id.matchOverlayContainer);
+        buttonContainer = (LinearLayout)rootView.findViewById(R.id.button_container);
+
+        investorMatchIcon = (ImageView)rootView.findViewById(R.id.investorMatchIcon);
+        founderMatchIcon = (ImageView)rootView.findViewById(R.id.founderMatchIcon);
+        callNow = (Button)rootView.findViewById(R.id.call_now);
+        later = (Button)rootView.findViewById(R.id.later);
 
         kickOffFoundersApiRequest();
-
-
 
         return rootView;
     }
@@ -128,14 +152,14 @@ public class InvestorSwipingFragment extends Fragment {
         Log.d(TAG, "configureSwipePager");
         Log.d(TAG, "" + founders.size());
 
-        SwipeFlingAdapterView flingContainer = (SwipeFlingAdapterView) rootView.findViewById(R.id
+        swipeView = (SwipeFlingAdapterView) rootView.findViewById(R.id
                 .investor_swipe_view);
         //choose your favorite adapter
         founderCardAdapter = new FounderCardAdapter(context, founders);
 
         //set the listener and the adapter
-        flingContainer.setAdapter(founderCardAdapter);
-        flingContainer.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
+        swipeView.setAdapter(founderCardAdapter);
+        swipeView.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
             @Override
             public void onScroll(float v) {
 
@@ -150,7 +174,6 @@ public class InvestorSwipingFragment extends Fragment {
 
             @Override
             public void onLeftCardExit(Object dataObject) {
-                Toast.makeText(context, "Left!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onLeftCardExit: " + dataObject.toString());
                 Log.d(TAG, "onLeftCardExit: founders" + founders.size());
                 founders.remove(0);
@@ -159,7 +182,6 @@ public class InvestorSwipingFragment extends Fragment {
 
             @Override
             public void onRightCardExit(Object dataObject) {
-                Toast.makeText(context, "Right!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onRightCardExit: " + dataObject.toString());
                 Log.d(TAG, "onRightCardExit: founders" + founders.get(0));
                 swipeRight("Andreessen Horowitz", founders.get(0).getCompany());
@@ -175,10 +197,10 @@ public class InvestorSwipingFragment extends Fragment {
         });
 
         // Optionally add an OnItemClickListener
-        flingContainer.setOnItemClickListener(new SwipeFlingAdapterView.OnItemClickListener() {
+        swipeView.setOnItemClickListener(new SwipeFlingAdapterView.OnItemClickListener() {
             @Override
             public void onItemClicked(int itemPosition, Object dataObject) {
-                Toast.makeText(context, "Click!", Toast.LENGTH_SHORT).show();
+
             }
         });
         founderCardAdapter.notifyDataSetChanged();
@@ -219,7 +241,84 @@ public class InvestorSwipingFragment extends Fragment {
     public void checkMatch() {
         Log.d(TAG, "checkMatch: " + match);
         if(match > 0) {
-            
+            matchOverlay.setVisibility(View.VISIBLE);
+            Animation fadeIn = new AlphaAnimation(0, 1);
+            fadeIn.setFillAfter(true);
+            fadeIn.setDuration(1200);
+            fadeIn.setInterpolator(new DecelerateInterpolator());
+            fadeIn.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    matchOverlay.setVisibility(View.VISIBLE);
+                    Log.d(TAG, "onAnimationStart: " + matchOverlay.getAlpha());
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    swipeView.setVisibility(View.GONE);
+                    Log.d(TAG, "onAnimationEnd: " + matchOverlay.getAlpha());
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            buttonContainer.setVisibility(View.VISIBLE);
+            Animation fadeIn2 = new AlphaAnimation(0, 1);
+            fadeIn2.setFillAfter(true);
+            fadeIn2.setDuration(600);
+            fadeIn2.setStartOffset(600);
+            fadeIn2.setInterpolator(new DecelerateInterpolator());
+            fadeIn2.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    buttonContainer.setVisibility(View.VISIBLE);
+                    Log.d(TAG, "onAnimationStart: " + matchOverlay.getAlpha());
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    Log.d(TAG, "onAnimationEnd: " + matchOverlay.getAlpha());
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            ScaleAnimation growInv = new ScaleAnimation(0,1,0,1,
+                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            growInv.setInterpolator(new BounceInterpolator());
+            growInv.setFillAfter(true);
+            growInv.setDuration(2000);
+
+            ScaleAnimation growFounder = new ScaleAnimation(0,1,0,1,
+                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            growFounder.setInterpolator(new BounceInterpolator());
+            growFounder.setFillAfter(true);
+            growFounder.setDuration(2000);
+
+            TranslateAnimation slideU1 = new TranslateAnimation(0,0,1000, 0);
+            slideU1.setInterpolator(new BounceInterpolator());
+            slideU1.setStartOffset(1000);
+            slideU1.setDuration(900);
+
+            TranslateAnimation slideUp2 = new TranslateAnimation(0,0,1000, 0);
+            slideUp2.setInterpolator(new DecelerateInterpolator());
+            slideUp2.setStartOffset(1200);
+            slideUp2.setDuration(800);
+
+            buttonContainer.startAnimation(fadeIn2);
+            investorMatchIcon.startAnimation(growInv);
+            founderMatchIcon.startAnimation(growFounder);
+            matchOverlay.startAnimation(fadeIn);
+            callNow.startAnimation(slideU1);
+            later.startAnimation(slideUp2);
+            Log.d(TAG, "startAnimation: " + matchOverlay.getAlpha());
+
         }
     }
 

@@ -200,7 +200,7 @@ public class RecordPitchFragment extends Fragment {
 //            Log.d(TAG, "" + videoSize);
 //            returnCursor.close();
 
-            Toast.makeText(context, "Starting upload..." + videoUrl, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Starting upload...", Toast.LENGTH_SHORT).show();
             rootView.findViewById(R.id.instructions_container).setVisibility(View.GONE);
             rootView.findViewById(R.id.upload_progress_container).setVisibility(View.VISIBLE);
 
@@ -379,8 +379,7 @@ public class RecordPitchFragment extends Fragment {
             public void onStateChanged(int id, TransferState state) {
                 Log.d(TAG, state.toString());
                 if (state.toString().equals("COMPLETED")) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Done uploading.", Toast
-                            .LENGTH_SHORT).show();
+
                     Log.d(TAG, Constants.S3_URL + key);
 
                     postToEvan(Constants.S3_URL + key);

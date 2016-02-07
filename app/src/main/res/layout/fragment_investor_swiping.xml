@@ -4,6 +4,7 @@
                 android:layout_width="match_parent"
               android:layout_height="match_parent">
 
+
     <com.lorentzos.flingswipe.SwipeFlingAdapterView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -15,6 +16,130 @@
         app:rotation_degrees="10"
         app:max_visible="1"
         app:min_adapter_stack="6" />
+
+    <RelativeLayout
+                 android:layout_width="match_parent"
+                 android:id="@+id/matchOverlayContainer"
+                 android:layout_height="match_parent"
+                 android:visibility="gone"
+                 android:paddingTop="20dp"
+                 android:background="#1B232F"
+                 android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|bottom"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Connected!"
+                    android:paddingTop="30dp"
+                    android:textColor="@color/dark_gray"
+                    android:textAlignment="center"
+                    android:textSize="38sp"
+
+                    />
+
+                <ImageView
+                    android:id="@+id/investorImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <ImageView
+                    android:id="@+id/founderImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="25dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_margin="20dp"
+                        android:id="@+id/investorMatchIcon"
+                        android:background="@drawable/green_ring"
+                        android:layout_height="80dp"/>
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_margin="20dp"
+                        android:background="@drawable/red_ring"
+                        android:id="@+id/founderMatchIcon"
+                        android:layout_height="100dp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Time for a quick intro call?"
+                    android:textAlignment="center"
+                    android:textColor="@color/dark_gray"
+                    android:paddingBottom="20dp"
+                    android:textSize="24sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:id="@+id/button_container"
+                    android:layout_gravity="center"
+                    android:layout_height="match_parent">
+                    <Button
+                        android:layout_width="250dp"
+                        android:layout_height="wrap_content"
+                        android:background="#4B9B26"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="15dp"
+                        android:text="Call Now"
+                        android:textStyle="bold"
+                        android:id="@+id/call_now"
+                        android:textSize="20dp"
+                        android:textColor="#FFFFFF" />
+                    <Button
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:background="#8A8B89"
+                        android:textColor="#FFFFFF"
+                        android:id="@+id/later"
+                        android:textStyle="normal"
+                        android:layout_marginTop="20dp"
+                        android:text="Schedule For Later"
+                        android:textSize="12dp"
+                        />
+                </LinearLayout>
+
+
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
 
 
 </RelativeLayout>
