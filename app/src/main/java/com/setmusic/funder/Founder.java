@@ -1,5 +1,6 @@
 package com.setmusic.funder;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
  * Created by oscarlafarga on 2/7/16.
  */
 public class Founder {
-    public int id;
+    public String id;
 
     public String videoUrl;
     public String company;
@@ -23,7 +24,20 @@ public class Founder {
     public List<Swipe> swipes;
 
     public Founder(JSONObject json) {
+        try {
+            this.id = json.getString("_id");
+            this.name = json.getString("name");
+            this.company = json.getString("company");
+            this.description = json.getString("description");
+            if(json.has("video_url")) {
+                this.videoUrl = json.getString("video_url");
+            } else {
+                this.videoUrl = "https://d1wbxby8dwa4u.cloudfront.net/brown/Suh+Dude.mp4";
+            }
 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public Founder(String name) {
@@ -37,7 +51,7 @@ public class Founder {
 
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

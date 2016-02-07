@@ -22,6 +22,8 @@
 
     <color name="white">#f7f7f7</color>
     <color name="gray">#bdc3c7</color>
+    <color name="dark_gray">#505151</color>
+
     <color name="black">#313542</color>
 
     <color name="black_transparent">#BF000000</color>

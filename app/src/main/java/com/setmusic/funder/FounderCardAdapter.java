@@ -3,6 +3,9 @@ package com.setmusic.funder;
 import android.content.Context;
 import android.graphics.Color;
 import android.media.AudioManager;
+import android.media.session.MediaController;
+import android.net.Uri;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,8 +99,9 @@ public class FounderCardAdapter extends BaseAdapter {
         holder.companyName.setText(founder.getCompany());
         holder.founderName.setText(founder.getName());
 
-        holder.video.setVideoPath(founder.getVideoUrl());
-        holder.video.start();
+        Log.d(TAG, founder.getCompany() + ": " + founder.getVideoUrl());
+
+        holder.video.setVideoURI(Uri.parse(founder.getVideoUrl()));
 
         holder.mute.setImageDrawable(new IconicsDrawable(context)
                 .icon(GoogleMaterial.Icon.gmd_volume_mute)

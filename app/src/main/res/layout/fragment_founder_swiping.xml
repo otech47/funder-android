@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:background="@color/red"
                 android:layout_height="match_parent">
 
     <com.lorentzos.flingswipe.SwipeFlingAdapterView
@@ -11,8 +10,8 @@
         android:layout_height="match_parent"
         android:id="@+id/founder_swipe_view"
         android:background="@color/gray_transparent"
-        android:padding="20dp"
-        app:rotation_degrees="16"
+        android:padding="10dp"
+        app:rotation_degrees="10"
         app:max_visible="4"
         app:min_adapter_stack="6" />
 

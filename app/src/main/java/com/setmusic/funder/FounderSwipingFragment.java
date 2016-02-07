@@ -2,17 +2,25 @@ package com.setmusic.funder;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +37,31 @@ public class FounderSwipingFragment extends Fragment {
     private List<Investor> investors;
     private InvestorCardAdapter investorAdapter;
 
+    private int match;
+
+    final Handler handler = new Handler();
+    final Runnable apiFailure = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "apiFailure");
+
+        }
+    };
+    final Runnable updateSwiperUI = new Runnable() {
+        @Override
+        public void run() {
+            configureSwipePager();
+
+        }
+    };
+    final Runnable checkMatchUI = new Runnable() {
+        @Override
+        public void run() {
+            checkMatch();
+
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,16 +75,54 @@ public class FounderSwipingFragment extends Fragment {
         mainActivity = (FunderMainActivity)getActivity();
         context = mainActivity.getApplicationContext();
 
-        rootView = inflater.inflate(R.layout.fragment_founder_swiping,container,false);
+        rootView = inflater.inflate(R.layout.fragment_founder_swiping, container, false);
+
+        kickOffInvestorsApiRequest();
+
+
+
+        return rootView;
+    }
+
+    public void kickOffInvestorsApiRequest() {
+        Log.d(TAG, "kickOffInvestorsApiRequest");
+
+        new ApiGetRequest(context).run("http://funder-app.azurewebsites.net/api/investors", new
+                Callback
+                        () {
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+                        Log.d(TAG, "ApiGetRequest: onFailure");
+
+                    }
+
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        Log.d(TAG, "ApiGetRequest: onResponse");
+                        Log.d(TAG, Integer.toString(response.code()));
+                        Log.d(TAG, response.headers().toString());
+                        try {
+                            JSONArray investorsJson = new JSONArray(response.body().string());
+                            Log.d(TAG, investorsJson.toString());
+                            investors = new ArrayList<>();
+                            for (int i = 0; i < investorsJson.length(); i++) {
+                                investors.add(new Investor(investorsJson.getJSONObject(i)));
+                            }
+                            handler.post(updateSwiperUI);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
+    public void configureSwipePager() {
+        Log.d(TAG, "configureSwipePager");
+        Log.d(TAG, "" + investors.size());
 
         //add the view via xml or programmatically
         SwipeFlingAdapterView flingContainer = (SwipeFlingAdapterView) rootView.findViewById(R.id
                 .founder_swipe_view);
-
-        investors = new ArrayList<>();
-
-        investors.add(new Investor("Hack@Brown Ventures"));
-        investors.add(new Investor("The Zuck"));
 
         //choose your favorite adapter
         investorAdapter = new InvestorCardAdapter(context, investors);
@@ -68,30 +139,28 @@ public class FounderSwipingFragment extends Fragment {
             public void removeFirstObjectInAdapter() {
                 // this is the simplest way to delete an object from the Adapter (/AdapterView)
                 Log.d("LIST", "removed object!");
+            }
+
+            @Override
+            public void onLeftCardExit(Object dataObject) {
+                Toast.makeText(context, "Left!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onLeftCardExit: " + dataObject.toString());
+                Log.d(TAG, "onLeftCardExit: founders" + investors.size());
                 investors.remove(0);
                 investorAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onLeftCardExit(Object dataObject) {
-                //Do something on the left!
-                //You also have access to the original object.
-                //If you want to use it just cast it (String) dataObject
-                Toast.makeText(context, "Left!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
             public void onRightCardExit(Object dataObject) {
                 Toast.makeText(context, "Right!", Toast.LENGTH_SHORT).show();
+                swipeRight(investors.get(0).getCompany(), "Elefunder");
+                investors.remove(0);
+                investorAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
-                // Ask for more data here
-                investorAdapter.add(new Investor("Investor"));
-                investorAdapter.notifyDataSetChanged();
-                Log.d("LIST", "notified");
-                itemsInAdapter++;
+                Log.d(TAG, "onAdapterAboutToEmpty");
             }
         });
 
@@ -102,7 +171,43 @@ public class FounderSwipingFragment extends Fragment {
                 Toast.makeText(context, "Click!", Toast.LENGTH_SHORT).show();
             }
         });
+        investorAdapter.notifyDataSetChanged();
 
-        return rootView;
+    }
+
+    public void swipeRight(String investor, String user) {
+        String postDataJson = "{\"target\": \"" + investor + "\", " +
+                "\"type\":true,\"user\":\"" + user + "\"}";
+        new ApiPostRequest(context).run("http://funder-app.azurewebsites.net/api/swipe/new",
+                postDataJson, new Callback() {
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+                        Log.d(TAG, "ApiPostRequest: onFailure");
+                        handler.post(apiFailure);
+                    }
+
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        Log.d(TAG, "ApiPostRequest: onResponse");
+                        Log.d(TAG, "" + response.code());
+                        Log.d(TAG, response.headers().toString());
+
+                        try {
+                            JSONObject json = new JSONObject(response.body().string());
+                            match = json.getInt("match");
+                            handler.post(checkMatchUI);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
+    }
+
+    public void checkMatch() {
+        Log.d(TAG, "checkMatch: " + match);
+
     }
 }
