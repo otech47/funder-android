@@ -17,6 +17,12 @@ public class Investor {
     public Investor() {
     }
 
+    public Investor(String name) {
+        this.name = name;
+        this.avgInvestment = "$50K - $300K";
+        this.location = "Providence, RI";
+    }
+
     public int getId() {
         return id;
     }

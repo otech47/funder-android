@@ -1,84 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:background="#1B232F"
-    android:orientation="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_gravity="center">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#E7E7E7">
+        android:id="@+id/info_container"
+        android:layout_alignParentBottom="true"
+        android:background="@color/transparent">
 
-        <ImageButton
-            android:id="@+id/investorImage"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:padding="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_height="120dp">
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:background="@color/black_transparent"
+                android:padding="5dp"
+                android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/investorText"
-                android:layout_width="200dp"
-                android:layout_height="150dp"
-                android:background="@color/white_transparent"
-                android:gravity="center"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="40sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <RelativeLayout
+                <TextView
+                    android:id="@+id/investorName"
+                    android:layout_centerHorizontal="true"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content"
+                    android:text="Investor Name"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="17sp" />
 
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                    <TextView
-                        android:id="@+id/investorAvgInvestmentText"
-                        android:layout_width="120dp"
-                        android:layout_height="50dp"
-                        android:background="@color/white_transparent"
-                        android:gravity="center"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="24sp" />
-
-                </RelativeLayout>
-
-                <RelativeLayout
+                <TextView
+                    android:id="@+id/clickToExpand"
+                    android:layout_centerHorizontal="true"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content"
+                    android:text="click to expand"
+                    android:gravity="bottom|center"
+                    android:textAllCaps="true"
+                    android:layout_alignParentBottom="true"
+                    android:paddingBottom="5dp"
+                    android:textColor="@color/gray"
+                    android:textSize="11sp" />
 
-                    <ImageView
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:paddingEnd="15dp"
+                    android:paddingStart="15dp"
+                    android:layout_above="@id/clickToExpand"
+                    android:layout_below="@id/investorName"
+                    android:layout_height="wrap_content">
 
+                    <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_weight="1"
+                        android:paddingStart="10dp"
+                        android:id="@+id/avgInvestmentContainer"
+                        android:layout_height="match_parent">
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:padding="5dp"
+                            android:id="@+id/avgInvestmentIcon"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_height="30dp"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:id="@+id/avgInvestmentText"
+                            android:textColor="@color/white"
+                            android:text="Avg Investment"
+                            android:layout_toEndOf="@id/avgInvestmentIcon"
+                            android:layout_centerVertical="true"
+                            android:layout_height="wrap_content"/>
+                    </RelativeLayout>
 
-                    <TextView
-                        android:id="@+id/investorLocationText"
-                        android:layout_width="120dp"
-                        android:layout_height="50dp"
-                        android:background="@color/white_transparent"
-                        android:gravity="center"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="24sp" />
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:id="@+id/locationContainer"
+                        android:layout_weight="1"
+                        android:paddingStart="10dp"
+                        android:layout_height="match_parent">
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_centerVertical="true"
+                            android:id="@+id/locationIcon"
+                            android:padding="5dp"
+                            android:layout_alignParentStart="true"
+                            android:layout_height="30dp"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:id="@+id/locationText"
+                            android:text="Location"
+                            android:textColor="@color/white"
+                            android:layout_toEndOf="@id/locationIcon"
+                            android:layout_centerVertical="true"
+                            android:layout_height="wrap_content"/>
+                    </RelativeLayout>
 
-                </RelativeLayout>
-
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
+                </LinearLayout>
 
 
-</LinearLayout>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
+

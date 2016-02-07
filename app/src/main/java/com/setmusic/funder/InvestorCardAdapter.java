@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -25,14 +26,14 @@ public class InvestorCardAdapter extends BaseAdapter {
     private static final String TAG = "InvestorCardAdapter";
 
     LayoutInflater inflater;
-    public List<Founder> investors;
+    public List<Investor> investors;
     private Context context;
     private DisplayImageOptions options;
     private int limit;
     public AudioManager audioManager;
     public int volumeToggle;
 
-    public InvestorCardAdapter(Context context, List<Founder> investors) {
+    public InvestorCardAdapter(Context context, List<Investor> investors) {
         this.context = context;
         this.investors = investors;
         this.inflater = LayoutInflater.from(context);
@@ -43,8 +44,8 @@ public class InvestorCardAdapter extends BaseAdapter {
         investors = new ArrayList<>();
     }
 
-    public void add(Founder f) {
-        this.investors.add(f);
+    public void add(Investor i) {
+        this.investors.add(i);
     }
 
     @Override
@@ -67,70 +68,43 @@ public class InvestorCardAdapter extends BaseAdapter {
 
         View view = convertView;
         final InvestorViewHolder holder;
-        Founder founder = investors.get(position);
+        Investor investor = investors.get(position);
         if (view == null) {
-            view = inflater.inflate(R.layout.view_founder_card, parent, false);
+            view = inflater.inflate(R.layout.view_investor_card, parent, false);
             holder = new InvestorViewHolder();
-            holder.video = (VideoView) view.findViewById(R.id.companyPitchVideo);
-            holder.companyName = (TextView) view.findViewById(R.id.companyName);
-            holder.founderName = (TextView) view.findViewById(R.id.founderName);
-            holder.mute = (ImageView) view.findViewById(R.id.mute_button);
-            holder.replay = (ImageView) view.findViewById(R.id.replay_button);
+            holder.investorName = (TextView) view.findViewById(R.id.investorName);
+            holder.location = (TextView) view.findViewById(R.id.locationText);
+            holder.avgInvestment = (TextView) view.findViewById(R.id.avgInvestmentText);
+            holder.image = (ImageView) view.findViewById(R.id.investorImage);
+            holder.dollarIcon = (ImageView) view.findViewById(R.id.avgInvestmentIcon);
+            holder.locationIcon = (ImageView) view.findViewById(R.id.locationIcon);
             view.setTag(holder);
         } else {
             holder = (InvestorViewHolder) view.getTag();
         }
-        holder.companyName.setText(founder.getCompany());
-        holder.founderName.setText(founder.getName());
+        holder.investorName.setText(investor.getName());
+        holder.location.setText(investor.getLocation());
+        holder.avgInvestment.setText(investor.getAvgInvestment());
 
-        holder.video.setVideoPath(founder.getVideoUrl());
-        holder.video.start();
-
-        holder.mute.setImageDrawable(new IconicsDrawable(context)
-                .icon(GoogleMaterial.Icon.gmd_volume_mute)
+        holder.dollarIcon.setImageDrawable(new IconicsDrawable(context)
+                .icon(FontAwesome.Icon.faw_usd)
                 .color(Color.WHITE));
-        holder.mute.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeToggle, 0);
-                if (volumeToggle == 6) {
-                    volumeToggle = 0;
-                    holder.mute.setImageDrawable(new IconicsDrawable(context)
-                            .icon(GoogleMaterial.Icon.gmd_volume_off)
-                            .color(Color.WHITE));
-                } else {
-                    volumeToggle = 6;
-                    holder.mute.setImageDrawable(new IconicsDrawable(context)
-                            .icon(GoogleMaterial.Icon.gmd_volume_mute)
-                            .color(Color.WHITE));
-                }
-
-            }
-        });
-
-        holder.replay.setImageDrawable(new IconicsDrawable(context)
-                .icon(GoogleMaterial.Icon.gmd_replay)
+        holder.locationIcon.setImageDrawable(new IconicsDrawable(context)
+                .icon(GoogleMaterial.Icon.gmd_location_on)
                 .color(Color.WHITE));
-        holder.replay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 6, 0);
-                volumeToggle = 0;
-                holder.video.start();
-            }
-        });
 
 
         return view;
     }
     public class InvestorViewHolder {
-        public VideoView video;
-        public ImageView mute;
-        public ImageView replay;
-        public TextView companyName;
-        public TextView founderName;
-        public TextView raise;
-        public TextView equity;
+        public ImageView image;
+        public ImageView locationIcon;
+
+        public ImageView dollarIcon;
+
+        public TextView investorName;
+        public TextView location;
+        public TextView avgInvestment;
 
     }
 }
