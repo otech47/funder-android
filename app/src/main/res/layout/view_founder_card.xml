@@ -1,67 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#1B232F"
-    android:layout_gravity="center"
-    android:orientation="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_gravity="center">
 
-    <LinearLayout
+    <VideoView
+        android:id="@+id/companyPitchVideo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:background="#E7E7E7">
+        android:id="@+id/info_container"
+        android:layout_alignParentBottom="true"
+        android:background="@color/transparent">
 
-        <!--<VideoView
-            android:id="@+id/companyPitchVideo"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" /> -->
+            android:paddingTop="10dp"
+            android:background="@color/black_transparent"
+            android:layout_alignParentBottom="true"
+            android:layout_height="120dp">
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/companyText"
-                android:layout_width="200dp"
-                android:layout_height="150dp"
-                android:background="@color/white_transparent"
-                android:layout_gravity="center"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="40sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <RelativeLayout
+                <TextView
+                    android:id="@+id/founderName"
+                    android:layout_centerHorizontal="true"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content"
+                    android:text="Founder Name"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="17sp" />
 
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                </RelativeLayout>
-
-                <RelativeLayout
+                <TextView
+                    android:id="@+id/companyName"
+                    android:layout_centerHorizontal="true"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content"
+                    android:text="Company Name"
+                    android:gravity="center"
+                    android:layout_below="@id/founderName"
+                    android:textColor="@android:color/white"
+                    android:textSize="19sp" />
 
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                <TextView
+                    android:id="@+id/clickToExpand"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="click to expand"
+                    android:gravity="bottom|center"
+                    android:textAllCaps="true"
+                    android:layout_alignParentBottom="true"
+                    android:paddingBottom="5dp"
+                    android:layout_below="@id/companyName"
+                    android:textColor="@color/gray"
+                    android:textSize="11sp" />
 
-                </RelativeLayout>
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="15dp"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/mute_button"
+                    android:background="@drawable/red_circle"
+                    android:padding="20dp"
+                    android:visibility="visible"
+                    android:layout_height="70dp"/>
 
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="15dp"
+                    android:padding="20dp"
+                    android:background="@drawable/green_circle"
+                    android:id="@+id/replay_button"
+                    android:visibility="visible"
+                    android:layout_height="70dp"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
 
 
-</LinearLayout>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
+
