@@ -149,6 +149,7 @@ public class RecordPitchFragment extends Fragment {
 
                 binaryBytes = IOUtils.toByteArray(in);
                 binaryData = new String(binaryBytes);
+                Log.d(TAG, "binaryBytes: " + binaryBytes.length);
             } catch (FileNotFoundException e) {
                 Log.e("cpsample", "file not found " + videoUrl, e);
             } catch (IOException e) {
@@ -173,7 +174,8 @@ public class RecordPitchFragment extends Fragment {
             rootView.findViewById(R.id.instructions_container).setVisibility(View.GONE);
             rootView.findViewById(R.id.upload_progress_container).setVisibility(View.VISIBLE);
 
-            uploadVideo();
+//            uploadVideo();
+
         }
     }
 
@@ -190,6 +192,7 @@ public class RecordPitchFragment extends Fragment {
                     @Override
                     public void onResponse(Response response) throws IOException {
                         Log.d(TAG, "ApiPostRequest: onResponse");
+                        Log.d(TAG, "Code: " + Integer.toString(response.code()));
                         try {
                             JSONObject jsonResponse = new JSONObject(response.body().string());
                             Log.d(TAG, jsonResponse.toString());
@@ -223,8 +226,9 @@ public class RecordPitchFragment extends Fragment {
                     @Override
                     public void onResponse(Response response) throws IOException {
                         Log.d(TAG, "ApiPutRequest: onResponse");
+                        Log.d(TAG, "Code: " + Integer.toString(response.code()));
                         Log.d(TAG, "Headers: " + response.headers().toString());
-                        completeUpload();
+                        verifyUpload();
                     }
                 });
     }
@@ -239,15 +243,51 @@ public class RecordPitchFragment extends Fragment {
             @Override
             public void onResponse(Response response) throws IOException {
                 Log.d(TAG, "ApiPostRequest: onResponse");
+                Log.d(TAG, "Code: " + Integer.toString(response.code()));
                 Log.d(TAG, "Headers: " + response.headers().toString());
-                try {
-                    JSONObject jsonResponse = new JSONObject(response.body().string());
-                    Log.d(TAG, jsonResponse.toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                String content = response.header("Content-Length");
+                String range = response.header("Range");
+                String[] segs = range.split("-");
+                Long lastByte = Long.parseLong(segs[segs.length - 1]);
+                Log.d(TAG, "Range: " + lastByte);
+
+                String resumeRange = "bytes " + (lastByte + 1) + "-" + Long.toString(videoSize) + "/" +
+                        Long.toString(videoSize);
+                Log.d(TAG, resumeRange);
+
+                if (lastByte >= videoSize) {
+                    completeUpload();
+                } else {
+                    resumeUpload(resumeRange);
                 }
             }
         });
+    }
+
+    public void resumeUpload(String range) {
+        Log.d(TAG, "resumeUpload");
+        Log.d(TAG, range);
+        Log.d(TAG, "" + videoSize);
+
+
+        new ApiPutRequest(context).runResume(linkSecure, binaryData, Long.toString(videoSize),
+                range, new Callback() {
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+                        Log.d(TAG, "ApiPutRequest: onFailure");
+                        e.printStackTrace();
+
+                    }
+
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        Log.d(TAG, "ApiPutRequest: onResponse");
+                        Log.d(TAG, "Code: " + Integer.toString(response.code()));
+                        Log.d(TAG, "Headers: " + response.headers().toString());
+
+                        verifyUpload();
+                    }
+                });
     }
 
     public void completeUpload() {
@@ -260,6 +300,7 @@ public class RecordPitchFragment extends Fragment {
             @Override
             public void onResponse(Response response) throws IOException {
                 Log.d(TAG, "ApiDeleteRequest: onResponse");
+                Log.d(TAG, "Code: " + Integer.toString(response.code()));
                 Log.d(TAG, "Headers: " + response.headers().toString());
                 locationUrl = response.header("Location");
 
