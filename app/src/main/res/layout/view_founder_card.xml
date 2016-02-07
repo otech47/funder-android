@@ -5,6 +5,11 @@
              android:layout_width="250dp"
              android:layout_height="300dp">
 
+    <VideoView
+        android:layout_width="match_parent"
+        android:id="@+id/companyPitchVideo"
+        android:layout_height="match_parent"/>
+
     <TextView
         android:id="@+id/companyText"
         android:textSize="40sp"

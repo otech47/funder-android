@@ -1,6 +1,7 @@
 package com.setmusic.funder;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,10 +10,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,6 +119,90 @@ public class InvestorSwipingFragment extends Fragment {
             }
         });
 
+
+
         return rootView;
     }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume");
+//        new JSONAsyncTask(this, "https://player.vimeo.com/video/" + + "/config").execute();
+
+    }
+
+    public class JSONAsyncTask extends AsyncTask<Void, Void, String> {
+        private Context mContext;
+        private String mUrl;
+        private String videoUrl;
+
+        public JSONAsyncTask(Context context, String url) {
+            mContext = context;
+            mUrl = url;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String resultString = null;
+            resultString = getJSON(mUrl);
+
+            return resultString;
+        }
+
+        @Override
+        protected void onPostExecute(String strings) {
+            super.onPostExecute(strings);
+            Log.d(TAG, strings);
+            try {
+                JSONObject json = new JSONObject(strings);
+                videoUrl = strings;
+                ((VideoView) rootView.findViewById(R.id.companyPitchVideo)).setVideoPath(videoUrl);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        private String getJSON(String url) {
+            HttpURLConnection c = null;
+            try {
+                URL u = new URL(url);
+                c = (HttpURLConnection) u.openConnection();
+                c.connect();
+                int status = c.getResponseCode();
+                switch (status) {
+                    case 200:
+                    case 201:
+                        BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                        StringBuilder sb = new StringBuilder();
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line+"\n");
+                        }
+                        br.close();
+                        return sb.toString();
+                }
+
+            } catch (Exception ex) {
+                return ex.toString();
+            } finally {
+                if (c != null) {
+                    try {
+                        c.disconnect();
+                    } catch (Exception ex) {
+                        //disconnect error
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
 }
