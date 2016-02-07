@@ -2,11 +2,13 @@ package com.setmusic.funder;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -14,26 +16,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.InputStream;
 
 /**
  * Created by oscarlafarga on 2/6/16.
@@ -50,7 +49,33 @@ public class RecordPitchFragment extends Fragment {
     private FloatingActionButton uploadButton;
 
     private Uri videoUrl;
-    private int videoSize;
+    private long videoSize;
+    private String linkSecure;
+    private byte[] binaryBytes;
+    private String binaryData;
+    private String completeUri;
+    private String ticketId;
+
+    private String locationUrl;
+
+
+    final Handler handler = new Handler();
+
+    final Runnable apiFailure = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "apiFailure");
+
+        }
+    };
+
+    final Runnable putRequestUI = new Runnable() {
+        @Override
+        public void run() {
+            putRequest();
+
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,6 +124,9 @@ public class RecordPitchFragment extends Fragment {
 
         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         if (takeVideoIntent.resolveActivity(context.getPackageManager()) != null) {
+//            File fileHD = new File(Environment.getExternalStorageDirectory() + File
+//                    .separator + "videoToUpload.jpg");
+//            takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fileHD));
             startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
         }
     }
@@ -111,10 +139,39 @@ public class RecordPitchFragment extends Fragment {
         if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
             videoUrl = intent.getData();
             Log.d(TAG, videoUrl.toString());
+            Cursor returnCursor = context.getContentResolver().query(videoUrl, null, null, null,
+                    null);
+            int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+
+            InputStream in = null;
+            try {
+                in = context.getContentResolver().openInputStream(videoUrl);
+
+                binaryBytes = IOUtils.toByteArray(in);
+                binaryData = new String(binaryBytes);
+            } catch (FileNotFoundException e) {
+                Log.e("cpsample", "file not found " + videoUrl, e);
+            } catch (IOException e) {
+                Log.e("io", "error found " + videoUrl, e);
+            }
+            finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        Log.e("cpsample", "could not close stream", e);
+                    }
+                }
+            }
+
+            returnCursor.moveToFirst();
+            videoSize = returnCursor.getLong(sizeIndex);
+            Log.d(TAG, "" + videoSize);
+            returnCursor.close();
+
             Toast.makeText(context, "Starting upload..." + videoUrl, Toast.LENGTH_SHORT).show();
             rootView.findViewById(R.id.instructions_container).setVisibility(View.GONE);
             rootView.findViewById(R.id.upload_progress_container).setVisibility(View.VISIBLE);
-
 
             uploadVideo();
         }
@@ -136,39 +193,78 @@ public class RecordPitchFragment extends Fragment {
                         try {
                             JSONObject jsonResponse = new JSONObject(response.body().string());
                             Log.d(TAG, jsonResponse.toString());
-                            String uploadLinkSecure = jsonResponse.getString("upload_link_secure");
-                            Log.d(TAG, uploadLinkSecure);
-                            int size = 22343;
+                            linkSecure = jsonResponse.getString("upload_link_secure");
+                            completeUri = jsonResponse.getString("complete_uri");
+                            Log.d(TAG, linkSecure);
 
-                            String putDataJson = "{\"Content-Length\": \"" + Integer.toString(size)
-                                    + "\",\"Content-Type\": \"video/mp4\"}";
-
-                            new ApiPutRequest(context).run(uploadLinkSecure, putDataJson, new Callback() {
-                                @Override
-                                public void onFailure(Request request, IOException e) {
-                                    Log.d(TAG, "ApiPutRequest: onFailure");
-
-                                }
-
-                                @Override
-                                public void onResponse(Response response) throws IOException {
-                                    Log.d(TAG, "ApiPutRequest: onResponse");
-
-                                    try {
-                                        JSONObject jsonResponse = new JSONObject(response.body()
-                                                .string());
-                                        Log.d(TAG, jsonResponse.toString());
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
+                            handler.post(putRequestUI);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                 });
+    }
+
+    public void putRequest() {
+        Log.d(TAG, binaryData);
+        Log.d(TAG, linkSecure);
+        Log.d(TAG, "" + videoSize);
+
+        new ApiPutRequest(context).runMp4(linkSecure, binaryData, Long.toString(videoSize), new
+                Callback() {
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+                        Log.d(TAG, "ApiPutRequest: onFailure");
+                        e.printStackTrace();
+
+                    }
+
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        Log.d(TAG, "ApiPutRequest: onResponse");
+                        Log.d(TAG, "Headers: " + response.headers().toString());
+                        completeUpload();
+                    }
+                });
+    }
+
+    public void verifyUpload() {
+        new ApiPutRequest(context).runVerify(linkSecure, new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Log.d(TAG, "ApiPostRequest: onFailure");
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                Log.d(TAG, "ApiPostRequest: onResponse");
+                Log.d(TAG, "Headers: " + response.headers().toString());
+                try {
+                    JSONObject jsonResponse = new JSONObject(response.body().string());
+                    Log.d(TAG, jsonResponse.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void completeUpload() {
+        new ApiDeleteRequest(context).run("https://api.vimeo.com" + completeUri, new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Log.d(TAG, "ApiDeleteRequest: onFailure");
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                Log.d(TAG, "ApiDeleteRequest: onResponse");
+                Log.d(TAG, "Headers: " + response.headers().toString());
+                locationUrl = response.header("Location");
+
+            }
+        });
     }
 
 

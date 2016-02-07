@@ -1,6 +1,7 @@
 package com.setmusic.funder;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -17,17 +18,16 @@ public class ApiPutRequest extends ApiRequest {
 
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
+    public static final MediaType MP4
+            = MediaType.parse("multipart/form-data");
     private Context context;
 
     public ApiPutRequest(Context context) {
-        client.setConnectTimeout(10, TimeUnit.SECONDS);
-        client.setWriteTimeout(10, TimeUnit.SECONDS);
-        client.setReadTimeout(30, TimeUnit.SECONDS);
         this.context = context;
 
     }
 
-    public void run(String route, String json, Callback callback) {
+    public void runJson(String route, String json, Callback callback) {
         RequestBody body = RequestBody.create(JSON, json);
         String headerType;
         String headerValue;
@@ -42,4 +42,44 @@ public class ApiPutRequest extends ApiRequest {
         call.enqueue(callback);
         this.call = call;
     }
+
+    public void runMp4(String route, String data, String contentLength, Callback callback) {
+        RequestBody body = RequestBody.create(MP4, data);
+        String headerType;
+        String headerValue;
+
+        Request request = new Request.Builder()
+                .url(route)
+                .addHeader("Authorization", "bearer " + Constants.VIMEO_KEY)
+                .addHeader("Content-Length", contentLength)
+                .addHeader("Content-Type", "video/mp4")
+                .put(body)
+                .build();
+
+        Log.d("runMp4", request.toString());
+        Log.d("runMp4", request.headers().toString());
+
+        Call call = client.newCall(request);
+        call.enqueue(callback);
+        this.call = call;
+    }
+
+    public void runVerify(String route, Callback callback) {
+
+        Request request = new Request.Builder()
+                .url(route)
+                .addHeader("Authorization", "bearer " + Constants.VIMEO_KEY)
+                .addHeader("Content-Length", "0")
+                .addHeader("Content-Range", "bytes */*")
+                .put(null)
+                .build();
+
+        Log.d("runVerify", request.toString());
+        Log.d("runVerify", request.headers().toString());
+
+        Call call = client.newCall(request);
+        call.enqueue(callback);
+        this.call = call;
+    }
+
 }
