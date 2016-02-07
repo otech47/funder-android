@@ -50,6 +50,7 @@ public class RecordPitchFragment extends Fragment {
     private FloatingActionButton uploadButton;
 
     private Uri videoUrl;
+    private int videoSize;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
