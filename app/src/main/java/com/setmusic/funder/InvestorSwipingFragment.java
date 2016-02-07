@@ -159,7 +159,6 @@ public class InvestorSwipingFragment extends Fragment {
             @Override
             public void onFailure(Request request, IOException e) {
                 Log.d(TAG, "ApiGetRequest: onFailure");
-
             }
 
             @Override
