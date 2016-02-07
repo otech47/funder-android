@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="greenButton">#00CF78</color>
+    <color name="redButton">#FD5C63</color>
+    <color name="topColor">#4C6D84</color>
+    <color name="topmostColor">#3C5769</color>
+    <color name="googleHangouts">#3F992C</color>
+    <color name="backgroundDark">#1B232E</color>
+    <color name="overlayTransparent">#BF000000</color>
+    <color name="overlayTransparentLight">#66393939</color>
+
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
