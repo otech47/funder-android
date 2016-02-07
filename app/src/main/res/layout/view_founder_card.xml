@@ -1,39 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_gravity="center"
-             android:layout_width="250dp"
-             android:layout_height="300dp">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1B232F"
+    android:orientation="vertical">
 
-    <VideoView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:id="@+id/companyPitchVideo"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#E7E7E7">
 
-    <TextView
-        android:id="@+id/companyText"
-        android:textSize="40sp"
-        android:textColor="@android:color/darker_gray"
-        android:background="@color/white_transparent"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        <VideoView
+            android:id="@+id/companyPitchVideo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <View
-        android:id="@+id/item_swipe_left_indicator"
-        android:alpha="0"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_margin="10dp"
-        android:background="#A5F" />
 
-    <View
-        android:id="@+id/item_swipe_right_indicator"
-        android:alpha="0"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_margin="10dp"
-        android:layout_gravity="right"
-        android:background="#5AF" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-</FrameLayout>
+            <TextView
+                android:id="@+id/companyText"
+                android:layout_width="200dp"
+                android:layout_height="150dp"
+                android:background="@color/white_transparent"
+                android:gravity="center"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="40sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>
