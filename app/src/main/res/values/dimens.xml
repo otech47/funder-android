@@ -10,4 +10,7 @@
     <dimen name="large">15dp</dimen>
     <dimen name="xlarge">20dp</dimen>
 
+    <dimen name="radius">10dp</dimen>
+    <dimen name="border">0dp</dimen>
+
 </resources>

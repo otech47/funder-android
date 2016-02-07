@@ -143,19 +143,25 @@ public class FounderSwipingFragment extends Fragment {
 
             @Override
             public void onLeftCardExit(Object dataObject) {
-                Toast.makeText(context, "Left!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onLeftCardExit: " + dataObject.toString());
                 Log.d(TAG, "onLeftCardExit: founders" + investors.size());
                 investors.remove(0);
                 investorAdapter.notifyDataSetChanged();
+                if(investors.size() == 0) {
+                    mainActivity.createAndAddFragment("InvestorSwipingFragment", InvestorSwipingFragment.class,
+                            false, null);
+                }
             }
 
             @Override
             public void onRightCardExit(Object dataObject) {
-                Toast.makeText(context, "Right!", Toast.LENGTH_SHORT).show();
-                swipeRight(investors.get(0).getCompany(), "Elefunder");
+                swipeRight(investors.get(0).getCompany(), "Funder");
                 investors.remove(0);
                 investorAdapter.notifyDataSetChanged();
+                if(investors.size() == 0) {
+                    mainActivity.createAndAddFragment("InvestorSwipingFragment", InvestorSwipingFragment.class,
+                            false, null);
+                }
             }
 
             @Override
@@ -168,7 +174,6 @@ public class FounderSwipingFragment extends Fragment {
         flingContainer.setOnItemClickListener(new SwipeFlingAdapterView.OnItemClickListener() {
             @Override
             public void onItemClicked(int itemPosition, Object dataObject) {
-                Toast.makeText(context, "Click!", Toast.LENGTH_SHORT).show();
             }
         });
         investorAdapter.notifyDataSetChanged();

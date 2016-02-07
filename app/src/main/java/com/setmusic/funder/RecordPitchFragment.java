@@ -100,6 +100,8 @@ public class RecordPitchFragment extends Fragment {
             File fileToDelete = new File(Environment.getExternalStorageDirectory() + File
                     .separator + "videoToUpload.mp4");
             fileToDelete.delete();
+            mainActivity.createAndAddFragment("FounderSwipingFragment",
+                    FounderSwipingFragment.class, false, null);
         }
     };
 
@@ -138,7 +140,8 @@ public class RecordPitchFragment extends Fragment {
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                uploadVideo();
+                mainActivity.createAndAddFragment("FounderSwipingFragment",
+                        FounderSwipingFragment.class, false, null);
             }
         });
 
@@ -403,7 +406,7 @@ public class RecordPitchFragment extends Fragment {
 
     public void postToEvan(String videoUrl) {
         String postDataJson = "{\"video_url\": \"" + videoUrl + "\", " +
-                "\"user\":\"Elefunder\"}";
+                "\"user\":\"Funder\"}";
 
         new ApiPostRequest(mainActivity).run("http://funder-app.azurewebsites.net/api/upload",
                 postDataJson, new Callback() {

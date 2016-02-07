@@ -2,6 +2,7 @@ package com.setmusic.funder;
 
 import android.media.Image;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -18,5 +19,5 @@ public class FounderViewHolder {
     public TextView founderName;
     public TextView raise;
     public TextView equity;
-
+    public ProgressBar loader;
 }

@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.context.IconicsContextWrapper;
 import com.mikepenz.iconics.context.IconicsLayoutInflater;
@@ -88,7 +89,17 @@ public class FunderMainActivity extends FragmentActivity  {
             }
         });
 
-        investorSwipingButton.callOnClick();
+        ImageView drawerButton = (ImageView)mainRootView.findViewById(R.id.drawer);
+        drawerButton.setImageDrawable(new IconicsDrawable(this)
+                .icon(FontAwesome.Icon.faw_bars)
+                .color(Color.WHITE));
+
+        ImageView messageButton = (ImageView)mainRootView.findViewById(R.id.message);
+        messageButton.setImageDrawable(new IconicsDrawable(this)
+                .icon(GoogleMaterial.Icon.gmd_message)
+                .color(Color.WHITE));
+
+        recordPitchButton.callOnClick();
 
     }
 

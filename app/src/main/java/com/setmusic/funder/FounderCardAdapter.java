@@ -3,6 +3,7 @@ package com.setmusic.funder;
 import android.content.Context;
 import android.graphics.Color;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.session.MediaController;
 import android.net.Uri;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -92,10 +94,12 @@ public class FounderCardAdapter extends BaseAdapter {
             holder.founderName = (TextView) view.findViewById(R.id.founderName);
             holder.mute = (ImageView) view.findViewById(R.id.mute_button);
             holder.replay = (ImageView) view.findViewById(R.id.replay_button);
+            holder.loader = (ProgressBar) view.findViewById(R.id.image_loader);
             view.setTag(holder);
         } else {
             holder = (FounderViewHolder) view.getTag();
         }
+        holder.loader.setVisibility(View.VISIBLE);
         holder.companyName.setText(founder.getCompany());
         holder.founderName.setText(founder.getName());
 
@@ -116,7 +120,7 @@ public class FounderCardAdapter extends BaseAdapter {
                             .icon(GoogleMaterial.Icon.gmd_volume_off)
                             .color(Color.WHITE));
                 } else {
-                    volumeToggle = 6;
+                    volumeToggle = 9;
                     holder.mute.setImageDrawable(new IconicsDrawable(context)
                             .icon(GoogleMaterial.Icon.gmd_volume_mute)
                             .color(Color.WHITE));
@@ -131,8 +135,19 @@ public class FounderCardAdapter extends BaseAdapter {
         holder.replay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 6, 0);
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 9, 0);
                 volumeToggle = 0;
+                holder.loader.setVisibility(View.GONE);
+                holder.video.start();
+            }
+        });
+
+        holder.video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 9, 0);
+                volumeToggle = 0;
+                holder.loader.setVisibility(View.GONE);
                 holder.video.start();
             }
         });

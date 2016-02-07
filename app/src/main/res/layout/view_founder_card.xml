@@ -26,7 +26,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:padding="5dp"
-                android:background="@color/black_transparent"
+                android:background="@drawable/rounded_black_transparent"
                 android:layout_height="match_parent">
 
                 <TextView
@@ -37,7 +37,7 @@
                     android:text="Founder Name"
                     android:gravity="center"
                     android:textColor="@android:color/white"
-                    android:textSize="17sp" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/companyName"
@@ -45,6 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Company Name"
+                    android:textStyle="bold"
                     android:gravity="center"
                     android:layout_below="@id/founderName"
                     android:textColor="@android:color/white"
@@ -55,13 +56,12 @@
                     android:layout_centerHorizontal="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="click to expand"
+                    android:text="click for details"
                     android:gravity="bottom|center"
-                    android:textAllCaps="true"
                     android:layout_alignParentBottom="true"
                     android:paddingBottom="5dp"
                     android:layout_below="@id/companyName"
-                    android:textColor="@color/topmostColor"
+                    android:textColor="@color/white_transparent"
                     android:textSize="11sp" />
 
                 <ImageView
@@ -95,6 +95,18 @@
 
 
     </RelativeLayout>
+
+    <ProgressBar
+        android:layout_width="50dp"
+        android:id="@+id/image_loader"
+        android:padding="100dp"
+        android:visibility="gone"
+        android:layout_alignTop="@id/companyPitchVideo"
+        android:layout_alignEnd="@id/companyPitchVideo"
+        android:layout_alignStart="@id/companyPitchVideo"
+        android:layout_alignBottom="@id/companyPitchVideo"
+        android:indeterminate="true"
+        android:layout_height="50dp"/>
 
 
 </RelativeLayout>
