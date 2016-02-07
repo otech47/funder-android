@@ -17,4 +17,5 @@
         app:max_visible="4"
         app:min_adapter_stack="6" />
 
+
 </RelativeLayout>

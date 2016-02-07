@@ -64,6 +64,27 @@ public class ApiPutRequest extends ApiRequest {
         this.call = call;
     }
 
+    public void runResume(String route, String data, String contentLength, String
+            contentRange, Callback callback) {
+        RequestBody body = RequestBody.create(MP4, data);
+
+        Request request = new Request.Builder()
+                .url(route)
+                .addHeader("Authorization", "bearer " + Constants.VIMEO_KEY)
+                .addHeader("Content-Length", contentLength)
+                .addHeader("Content-Range", contentRange)
+                .addHeader("Content-Type", "video/mp4")
+                .put(body)
+                .build();
+
+        Log.d("runResume", request.toString());
+        Log.d("runResume", request.headers().toString());
+
+        Call call = client.newCall(request);
+        call.enqueue(callback);
+        this.call = call;
+    }
+
     public void runVerify(String route, Callback callback) {
 
         Request request = new Request.Builder()

@@ -1,10 +1,12 @@
 package com.setmusic.funder;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.LayoutInflaterCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -12,6 +14,8 @@ import android.widget.ImageView;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.context.IconicsContextWrapper;
+import com.mikepenz.iconics.context.IconicsLayoutInflater;
 
 public class FunderMainActivity extends FragmentActivity  {
 
@@ -24,6 +28,11 @@ public class FunderMainActivity extends FragmentActivity  {
     private ImageButton investorSwipingButton;
     private ImageButton founderSwipingButton;
     private ImageButton recordPitchButton;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(IconicsContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

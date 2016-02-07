@@ -1,7 +1,6 @@
 package com.setmusic.funder;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,20 +8,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,9 +32,29 @@ public class InvestorSwipingFragment extends Fragment {
     private FunderMainActivity mainActivity;
     private Context context;
     private View rootView;
+    private VideoView videoView;
 
-    private ArrayList<String> companies;
-    private ArrayAdapter<String> companyAdapter;
+    String videoUrl;
+
+    private List<Founder> founders;
+    private FounderCardAdapter founderCardAdapter;
+
+    final android.os.Handler handler = new android.os.Handler();
+    final Runnable apiFailure = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "apiFailure");
+
+        }
+    };
+    final Runnable updateVideoUI = new Runnable() {
+        @Override
+        public void run() {
+            updateVideo();
+
+        }
+    };
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,26 +71,19 @@ public class InvestorSwipingFragment extends Fragment {
 
         rootView = inflater.inflate(R.layout.fragment_investor_swiping,container,false);
 
-        //add the view via xml or programmatically
         SwipeFlingAdapterView flingContainer = (SwipeFlingAdapterView) rootView.findViewById(R.id
                 .investor_swipe_view);
 
-        companies = new ArrayList<>();
+        founders = new ArrayList<>();
 
-        companies.add("Funder");
-        companies.add("Setmusic");
-        companies.add("Googluber");
-        companies.add("Just Another Startup LLC");
-        companies.add("Snapstagram");
-        companies.add("Sign My NDA First Inc.");
-        companies.add("Need Developers for App Idea Ltd.");
+        founders.add(new Founder("Evan Martinez"));
+        founders.add(new Founder("Oscar Lafarga"));
 
         //choose your favorite adapter
-        companyAdapter = new ArrayAdapter<String>(context, R.layout.view_founder_card,
-                R.id.companyText, companies);
+        founderCardAdapter = new FounderCardAdapter(context, founders);
 
         //set the listener and the adapter
-        flingContainer.setAdapter(companyAdapter);
+        flingContainer.setAdapter(founderCardAdapter);
         flingContainer.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
             @Override
             public void onScroll(float v) {
@@ -84,8 +94,8 @@ public class InvestorSwipingFragment extends Fragment {
             public void removeFirstObjectInAdapter() {
                 // this is the simplest way to delete an object from the Adapter (/AdapterView)
                 Log.d("LIST", "removed object!");
-                companies.remove(0);
-                companyAdapter.notifyDataSetChanged();
+                founders.remove(0);
+                founderCardAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -104,8 +114,8 @@ public class InvestorSwipingFragment extends Fragment {
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
                 // Ask for more data here
-                companyAdapter.add("XML ".concat(String.valueOf(itemsInAdapter)));
-                companyAdapter.notifyDataSetChanged();
+                founderCardAdapter.add(new Founder("Founder"));
+                founderCardAdapter.notifyDataSetChanged();
                 Log.d("LIST", "notified");
                 itemsInAdapter++;
             }
@@ -119,8 +129,6 @@ public class InvestorSwipingFragment extends Fragment {
             }
         });
 
-
-
         return rootView;
     }
 
@@ -129,80 +137,35 @@ public class InvestorSwipingFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-//        new JSONAsyncTask(this, "https://player.vimeo.com/video/" + + "/config").execute();
+//        new ApiGetRequest(context).run("https://player.vimeo.com/video/154461399/config", new Callback() {
+//            @Override
+//            public void onFailure(Request request, IOException e) {
+//                Log.d(TAG, "ApiGetRequest: onFailure");
+//            }
+//
+//            @Override
+//            public void onResponse(Response response) throws IOException {
+//                Log.d(TAG, "ApiGetRequest: onResponse");
+//                Log.d(TAG, Integer.toString(response.code()));
+//                Log.d(TAG, response.headers().toString());
+//                try {
+//                    JSONObject json = new JSONObject(response.body().string());
+//                    Log.d(TAG, json.toString());
+//                    videoUrl = json.getJSONObject("request").getJSONObject("files")
+//                            .getJSONArray("progressive").getJSONObject(0).getString("url");
+//                    handler.post(updateVideoUI);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//        });
 
     }
 
-    public class JSONAsyncTask extends AsyncTask<Void, Void, String> {
-        private Context mContext;
-        private String mUrl;
-        private String videoUrl;
-
-        public JSONAsyncTask(Context context, String url) {
-            mContext = context;
-            mUrl = url;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            String resultString = null;
-            resultString = getJSON(mUrl);
-
-            return resultString;
-        }
-
-        @Override
-        protected void onPostExecute(String strings) {
-            super.onPostExecute(strings);
-            Log.d(TAG, strings);
-            try {
-                JSONObject json = new JSONObject(strings);
-                videoUrl = strings;
-                //((VideoView) rootView.findViewById(R.id.companyPitchVideo)).setVideoPath(videoUrl);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        private String getJSON(String url) {
-            HttpURLConnection c = null;
-            try {
-                URL u = new URL(url);
-                c = (HttpURLConnection) u.openConnection();
-                c.connect();
-                int status = c.getResponseCode();
-                switch (status) {
-                    case 200:
-                    case 201:
-                        BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                        StringBuilder sb = new StringBuilder();
-                        String line;
-                        while ((line = br.readLine()) != null) {
-                            sb.append(line+"\n");
-                        }
-                        br.close();
-                        return sb.toString();
-                }
-
-            } catch (Exception ex) {
-                return ex.toString();
-            } finally {
-                if (c != null) {
-                    try {
-                        c.disconnect();
-                    } catch (Exception ex) {
-                        //disconnect error
-                    }
-                }
-            }
-            return null;
-        }
+    public void updateVideo() {
+        videoView.setVideoPath(videoUrl);
+        videoView.start();
     }
 
 }

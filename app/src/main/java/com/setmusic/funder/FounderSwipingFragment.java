@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by oscarlafarga on 2/6/16.
@@ -25,8 +26,8 @@ public class FounderSwipingFragment extends Fragment {
     private Context context;
     private View rootView;
 
-    private ArrayList<String> investors;
-    private ArrayAdapter<String> investorAdapter;
+    private List<Investor> investors;
+    private InvestorCardAdapter investorAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,17 +49,12 @@ public class FounderSwipingFragment extends Fragment {
                 .founder_swipe_view);
 
         investors = new ArrayList<>();
-        investors.add("Hack@Brown Ventures");
-        investors.add("The Zuck");
-        investors.add("Andreessen Horowitz");
-        investors.add("Prick Investor Group Inc.");
-        investors.add("Microsoft Ventures");
-        investors.add("I Hate Your Company LLC");
-        investors.add("Make Us Money Ltd.");
+
+        investors.add(new Investor("Hack@Brown Ventures"));
+        investors.add(new Investor("The Zuck"));
 
         //choose your favorite adapter
-        investorAdapter = new ArrayAdapter<String>(context, R.layout.view_investor_card,
-                R.id.investorText, investors);
+        investorAdapter = new InvestorCardAdapter(context, investors);
 
         //set the listener and the adapter
         flingContainer.setAdapter(investorAdapter);
@@ -92,7 +88,7 @@ public class FounderSwipingFragment extends Fragment {
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
                 // Ask for more data here
-                investorAdapter.add("XML ".concat(String.valueOf(itemsInAdapter)));
+                investorAdapter.add(new Investor("Investor"));
                 investorAdapter.notifyDataSetChanged();
                 Log.d("LIST", "notified");
                 itemsInAdapter++;
