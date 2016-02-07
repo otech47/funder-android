@@ -55,7 +55,6 @@
                 android:text="Link up with a short video call!"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
-                android:textWeight="bold"
                 android:paddingBottom="20dp"
                 android:textSize="34sp" />
 
